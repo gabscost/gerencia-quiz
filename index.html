@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz - Gerenciamento de Riscos em Projetos de Software</title>
+    <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #2ecc71;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --dark-bg: #2c3e50;
+            --dark-card: #34495e;
+            --dark-text: #ecf0f1;
+            --light-bg: #ecf0f1;
+            --light-card: #ffffff;
+            --light-text: #2c3e50;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background-color: var(--light-bg);
+            color: var(--light-text);
+            padding: 20px;
+        }
+        
+        body.dark-mode {
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--light-card);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        body.dark-mode .container {
+            background-color: var(--dark-card);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        body.dark-mode header {
+            border-bottom: 1px solid #555;
+        }
+        
+        h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+        
+        .description {
+            color: #7f8c8d;
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+        
+        body.dark-mode .description {
+            color: #bdc3c7;
+        }
+        
+        .quiz-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .info-item {
+            background-color: #e8f4fc;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin: 5px;
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        body.dark-mode .info-item {
+            background-color: #2c3e50;
+        }
+        
+        .question-container {
+            margin-bottom: 25px;
+        }
+        
+        .question {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #e8f4fc;
+            border-radius: 10px;
+            line-height: 1.5;
+        }
+        
+        body.dark-mode .question {
+            background-color: #2c3e50;
+        }
+        
+        .options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        
+        .option {
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .option:hover {
+            background-color: #f0f8ff;
+            border-color: var(--primary);
+        }
+        
+        body.dark-mode .option {
+            border-color: #555;
+        }
+        
+        body.dark-mode .option:hover {
+            background-color: #2c3e50;
+            border-color: var(--primary);
+        }
+        
+        .option.selected {
+            background-color: #d1ecf1;
+            border-color: var(--primary);
+            font-weight: bold;
+        }
+        
+        body.dark-mode .option.selected {
+            background-color: #1e5128;
+            border-color: var(--secondary);
+        }
+        
+        .option.correct {
+            background-color: #d4edda;
+            border-color: var(--secondary);
+        }
+        
+        body.dark-mode .option.correct {
+            background-color: #1e5128;
+            border-color: var(--secondary);
+        }
+        
+        .option.incorrect {
+            background-color: #f8d7da;
+            border-color: var(--danger);
+        }
+        
+        body.dark-mode .option.incorrect {
+            background-color: #852424;
+            border-color: var(--danger);
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+        }
+        
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        #prev-btn {
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        
+        #next-btn, #submit-btn {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        #next-btn:hover, #submit-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        #theme-toggle {
+            background-color: var(--warning);
+            color: white;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            padding: 10px 15px;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .progress-container {
+            margin-top: 20px;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        body.dark-mode .progress-bar {
+            background-color: #2c3e50;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: var(--primary);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .result-container {
+            text-align: center;
+            padding: 30px;
+        }
+        
+        .score {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 20px 0;
+            color: var(--primary);
+        }
+        
+        .review-btn {
+            background-color: var(--warning);
+            color: white;
+            margin-top: 20px;
+        }
+        
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            display: none;
+        }
+        
+        .feedback.correct {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .feedback.incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        body.dark-mode .feedback.correct {
+            background-color: #1e5128;
+            color: #d4edda;
+        }
+        
+        body.dark-mode .feedback.incorrect {
+            background-color: #852424;
+            color: #f8d7da;
+        }
+        
+        @media (max-width: 600px) {
+            .options {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            button {
+                width: 100%;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .question {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button id="theme-toggle">🌙</button>
+    
+    <div class="container">
+        <header>
+            <h1>Quiz - Gerenciamento de Riscos em Projetos de Software</h1>
+            <p class="description">Teste seus conhecimentos sobre gestão de riscos em projetos de software</p>
+        </header>
+        
+        <div class="quiz-info">
+            <div class="info-item">Questão: <span id="current-question">1</span>/5</div>
+            <div class="info-item">Corretas: <span id="correct-answers">0</span></div>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+        </div>
+        
+        <div id="quiz-content">
+            <div class="question-container">
+                <div class="question" id="question"></div>
+                <div class="options" id="options"></div>
+                <div id="feedback" class="feedback"></div>
+            </div>
+            
+            <div class="controls">
+                <button id="prev-btn">Anterior</button>
+                <button id="next-btn">Próxima</button>
+                <button id="submit-btn" style="display: none;">Finalizar Quiz</button>
+            </div>
+        </div>
+        
+        <div id="result-section" style="display: none;">
+            <div class="result-container">
+                <h2>Quiz Finalizado!</h2>
+                <p>Sua pontuação:</p>
+                <div class="score" id="final-score">0/5</div>
+                <p id="performance-message"></p>
+                <button id="restart-btn">Refazer Quiz</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Questões sobre gerenciamento de riscos em projetos de software
+        const questions = [
+            {
+                question: "Nos projetos de software, como podemos compreender o conceito de risco?",
+                options: [
+                    "Um evento certo e previsível que compromete prazos e custos.",
+                    "Uma incerteza que pode gerar tanto oportunidades quanto ameaças para os objetivos do projeto.",
+                    "Um fator técnico que sempre resulta em falhas de qualidade.",
+                    "Uma etapa obrigatória de auditoria imposta por normas internacionais."
+                ],
+                correct: 1,
+                explanation: "Risco em projetos de software é compreendido como uma incerteza que pode gerar tanto oportunidades quanto ameaças para os objetivos do projeto, não sendo apenas eventos negativos."
+            },
+            {
+                question: "Por que o gerenciamento de riscos é considerado estratégico em projetos de software?",
+                options: [
+                    "Porque garante a eliminação total dos riscos antes do início do projeto.",
+                    "Porque permite decisões mais informadas, reduz a probabilidade de falhas e aumenta a chance de sucesso.",
+                    "Porque substitui a necessidade de planejamento de custos e prazos.",
+                    "Porque é exigência legal em contratos de software no Brasil."
+                ],
+                correct: 1,
+                explanation: "O gerenciamento de riscos é estratégico porque permite decisões mais informadas, reduz a probabilidade de falhas e aumenta a chance de sucesso do projeto, tornando-o mais previsível e controlável."
+            },
+            {
+                question: "Em pequenas empresas de base tecnológica incubadas, qual é a realidade mais observada em relação à gestão de riscos?",
+                options: [
+                    "Adoção sistemática de metodologias internacionais de risco, como PMBOK e CMMI.",
+                    "Falta de práticas estruturadas de risco, ainda que a maioria reconheça a importância de implantá-las.",
+                    "Substituição do gerenciamento de riscos por controles de qualidade tradicionais.",
+                    "Total desinteresse pelo tema, visto que projetos pequenos não sofrem riscos significativos."
+                ],
+                correct: 1,
+                explanation: "Em pequenas empresas de base tecnológica incubadas, observa-se principalmente a falta de práticas estruturadas de risco, mesmo que a maioria reconheça a importância de implantá-las."
+            },
+            {
+                question: "De acordo com a literatura, quais fatores estão entre os mais comuns para o fracasso de projetos de software?",
+                options: [
+                    "Metas irrealistas, requisitos mal definidos, comunicação deficiente e uso de tecnologias imaturas.",
+                    "Equipes motivadas demais e excesso de inovação.",
+                    "Planejamento excessivamente detalhado e rígido.",
+                    "Custos baixos e prazos curtos acordados desde o início."
+                ],
+                correct: 0,
+                explanation: "Os fatores mais comuns para o fracasso de projetos de software incluem metas irrealistas, requisitos mal definidos, comunicação deficiente e uso de tecnologias imaturas."
+            },
+            {
+                question: "Qual é o principal benefício esperado ao aplicar práticas de gestão de riscos em projetos de software?",
+                options: [
+                    "Garantir que todos os projetos sejam entregues no prazo e sem custos adicionais.",
+                    "Substituir a experiência da equipe por ferramentas automáticas de controle.",
+                    "Provar a clientes e investidores que o projeto é livre de incertezas.",
+                    "Permitir uma tomada de decisão mais consciente, reduzindo impactos negativos e aumentando a confiabilidade do processo."
+                ],
+                correct: 3,
+                explanation: "O principal benefício da gestão de riscos é permitir uma tomada de decisão mais consciente, reduzindo impactos negativos e aumentando a confiabilidade do processo de desenvolvimento de software."
+            }
+        ];
+
+        // Variáveis de estado do quiz
+        let currentQuestion = 0;
+        let score = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let answeredQuestions = new Array(questions.length).fill(false);
+
+        // Elementos DOM
+        const questionElement = document.getElementById('question');
+        const optionsElement = document.getElementById('options');
+        const currentQuestionElement = document.getElementById('current-question');
+        const correctAnswersElement = document.getElementById('correct-answers');
+        const progressElement = document.getElementById('progress');
+        const nextButton = document.getElementById('next-btn');
+        const prevButton = document.getElementById('prev-btn');
+        const submitButton = document.getElementById('submit-btn');
+        const quizContent = document.getElementById('quiz-content');
+        const resultSection = document.getElementById('result-section');
+        const finalScoreElement = document.getElementById('final-score');
+        const performanceMessageElement = document.getElementById('performance-message');
+        const restartButton = document.getElementById('restart-btn');
+        const themeToggle = document.getElementById('theme-toggle');
+        const feedbackElement = document.getElementById('feedback');
+
+        // Inicializar quiz
+        function initQuiz() {
+            showQuestion(0);
+            
+            // Event listeners
+            nextButton.addEventListener('click', nextQuestion);
+            prevButton.addEventListener('click', prevQuestion);
+            submitButton.addEventListener('click', submitQuiz);
+            restartButton.addEventListener('click', restartQuiz);
+            themeToggle.addEventListener('click', toggleTheme);
+        }
+
+        // Mostrar questão
+        function showQuestion(index) {
+            if (index < 0 || index >= questions.length) return;
+            
+            currentQuestion = index;
+            const question = questions[index];
+            
+            questionElement.textContent = question.question;
+            optionsElement.innerHTML = '';
+            feedbackElement.style.display = 'none';
+            
+            question.options.forEach((option, i) => {
+                const optionElement = document.createElement('div');
+                optionElement.classList.add('option');
+                
+                // Verificar se esta opção foi selecionada anteriormente
+                if (userAnswers[index] === i) {
+                    optionElement.classList.add('selected');
+                    
+                    // Se a questão já foi respondida, mostrar se está correta ou não
+                    if (answeredQuestions[index]) {
+                        if (i === question.correct) {
+                            optionElement.classList.add('correct');
+                        } else if (i === userAnswers[index]) {
+                            optionElement.classList.add('incorrect');
+                        }
+                    }
+                }
+                
+                optionElement.textContent = option;
+                
+                // Só permitir clicar se a questão ainda não foi respondida
+                if (!answeredQuestions[index]) {
+                    optionElement.addEventListener('click', () => selectOption(i));
+                }
+                
+                optionsElement.appendChild(optionElement);
+            });
+            
+            // Atualizar informações da questão
+            currentQuestionElement.textContent = index + 1;
+            correctAnswersElement.textContent = score;
+            
+            // Atualizar barra de progresso
+            progressElement.style.width = `${((index + 1) / questions.length) * 100}%`;
+            
+            // Controlar visibilidade dos botões
+            prevButton.style.display = index === 0 ? 'none' : 'block';
+            nextButton.style.display = index === questions.length - 1 ? 'none' : 'block';
+            submitButton.style.display = index === questions.length - 1 ? 'block' : 'none';
+        }
+
+        // Selecionar opção
+        function selectOption(optionIndex) {
+            // Marcar questão como respondida
+            answeredQuestions[currentQuestion] = true;
+            
+            // Remover seleção anterior
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => option.classList.remove('selected'));
+            
+            // Marcar nova seleção
+            options[optionIndex].classList.add('selected');
+            
+            // Armazenar resposta
+            userAnswers[currentQuestion] = optionIndex;
+            
+            // Verificar se a resposta está correta
+            const isCorrect = optionIndex === questions[currentQuestion].correct;
+            
+            // Destacar resposta correta e incorreta
+            options[questions[currentQuestion].correct].classList.add('correct');
+            if (!isCorrect) {
+                options[optionIndex].classList.add('incorrect');
+            }
+            
+            // Atualizar pontuação
+            if (isCorrect) {
+                score++;
+                correctAnswersElement.textContent = score;
+            }
+            
+            // Mostrar feedback
+            feedbackElement.textContent = isCorrect 
+                ? "✅ Correto! " + questions[currentQuestion].explanation 
+                : "❌ Incorreto! " + questions[currentQuestion].explanation;
+                
+            feedbackElement.className = isCorrect ? "feedback correct" : "feedback incorrect";
+            feedbackElement.style.display = 'block';
+            
+            // Desabilitar cliques nas opções após responder
+            options.forEach(option => {
+                option.style.pointerEvents = 'none';
+            });
+        }
+
+        // Próxima questão
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                showQuestion(currentQuestion + 1);
+            }
+        }
+
+        // Questão anterior
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                showQuestion(currentQuestion - 1);
+            }
+        }
+
+        // Enviar quiz
+        function submitQuiz() {
+            // Calcular pontuação final
+            let finalScore = 0;
+            userAnswers.forEach((answer, index) => {
+                if (answer === questions[index].correct) {
+                    finalScore++;
+                }
+            });
+            
+            // Exibir resultados
+            quizContent.style.display = 'none';
+            resultSection.style.display = 'block';
+            
+            finalScoreElement.textContent = `${finalScore}/${questions.length}`;
+            
+            // Mensagem de desempenho
+            if (finalScore >= 4) {
+                performanceMessageElement.textContent = 'Excelente! Você demonstrou domínio do conteúdo de gerenciamento de riscos.';
+            } else if (finalScore >= 3) {
+                performanceMessageElement.textContent = 'Bom trabalho! Você tem um bom entendimento do conteúdo.';
+            } else {
+                performanceMessageElement.textContent = 'Você precisa estudar mais o conteúdo. Não desista!';
+            }
+        }
+
+        // Reiniciar quiz
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            answeredQuestions = new Array(questions.length).fill(false);
+            
+            quizContent.style.display = 'block';
+            resultSection.style.display = 'none';
+            
+            showQuestion(0);
+        }
+
+        // Alternar entre modo claro e escuro
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            if (document.body.classList.contains('dark-mode')) {
+                themeToggle.textContent = '☀️';
+            } else {
+                themeToggle.textContent = '🌙';
+            }
+        }
+
+        // Iniciar o quiz quando a página carregar
+        window.addEventListener('load', initQuiz);
+    </script>
+</body>
+</html>
